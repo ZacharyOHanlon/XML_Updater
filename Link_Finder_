@@ -1,0 +1,34 @@
+Clear;[string]$SearchPath = read-host "Where are the files to check? Format is \\server\folders\";clear;Write-host "Working...";$LineText = Get-ChildItem -Path $SearchPath -Recurse -Include *.xml | select-string   -Pattern "`"Parameters`"";$FilePath = "C:\Logs\hyperlink_log.txt";$SearchFor = read-host "What string should I sort by?";$SearchFor = '*' + $SearchFor + '*';$LineText = $LineText | Get-Unique;$LineText = $LineText | Sort-Object -Property @{Expression={$_.line -like $SearchFor}; Descending = $True},@{Expression={$_.Path}; Descending = $False};$lineTest = $LineText | Format-Table  -Property FileName, Line -Auto -GroupBy {$_.line -like $SearchFor} | out-file -filepath $FilePath -width 320;$Truncated = gc $FilePath | %{$_ -replace "\<Parameter Name=\`"Parameters\`" Value=\`"",'' -replace"\`" ReadOnly=\`"False\`" Version=\`"1\`"\/\>"  -replace"&quot;","`""};$Truncated | out-file -filepath $FilePath;clear;write-host "Script finished, check "  $FilePath  " for log."
+
+Description:
+
+	This script is designed to search through a specified set of folders and find all sidebars/day flow menus/authored lessons and find links to external media(DSPs, videos, welcome presentations, etc.). It is a PowerShell script, PowerShell was chosen beause it is a Built-in utility of Windows 7 and up.
+
+Before first use:
+
+	Find and replace " C:\Logs\log.txt " with a location where you want the logs to go. Save this file after you make the change and make this file read-only.
+	This is the path for the output. You need to be able to write files to that location.
+
+Usage instructions:
+	
+	Open the Start Menu and search for Windows PowerShell. 
+
+	Copy the whole first line of this text file and paste into PowerShell by right-clicking the blue area.
+
+	The sript will now ask you where the files are located. The script is designed to search through the folder you specify and all folders under it. This means that you should be specific to one program at a time.
+
+		Please note that this will take from 30 seconds to a couple of minutes because it has to go through every line of code in every xml file to find the external links.
+
+	The script will now ask what string you want to sort by. I usually start with my  to see what stuff is linked to a server location. Other options include sorting by file type( "exe","ppt"(note that sorting by ppt will include pptx files),"pdf",etc.)
+
+	The script is now finished and has written the results to the file you specified.
+
+Things to note:
+	
+	File paths can have spaces, but the spaces must be replaced by a question mark "?"
+
+	Sort only works on the link, not on the file path 
+
+	script will not find hidden files
+
+created by:	Zachary O'Hanlon
