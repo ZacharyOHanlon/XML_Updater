@@ -1,15 +1,14 @@
 Clear;
 [string]$SearchPath = read-host "Where are the files to check? Format is \\server\folders\";
-clear;
+Clear;
 Write-host "Working...";
 $LineText = Get-ChildItem -Path $SearchPath -Recurse -Include *.xml | select-string   -Pattern "`"Parameters`"";
 $FilePath = "C:\Logs\hyperlink_log.txt";
-$SearchFor = read-host "What string should I sort by?";
+$SearchFor = Read-Host "What string should I sort by?";
 $SearchFor = '*' + $SearchFor + '*';
 $LineText = $LineText | Get-Unique;
-$LineText = $LineText | Sort-Object -Property @{Expression={$_.line -like $SearchFor}; Descending = $True},@{Expression={$_.Path};
-Descending = $False};
+$LineText = $LineText | Sort-Object -Property @{Expression={$_.line -like $SearchFor}; Descending = $True},@{Expression={$_.Path};Descending = $False};
 $lineTest = $LineText | Format-Table  -Property FileName, Line -Auto -GroupBy {$_.line -like $SearchFor} | out-file -filepath $FilePath -width 320;
 $Truncated = gc $FilePath | %{$_ -replace "\<Parameter Name=\`"Parameters\`" Value=\`"",'' -replace"\`" ReadOnly=\`"False\`" Version=\`"1\`"\/\>"  -replace"&quot;","`""};$Truncated | out-file -filepath $FilePath;
-clear;
-write-host "Script finished, check "  $FilePath  " for log."
+Clear;
+Write-Host "Script finished, check "  $FilePath  " for log."
